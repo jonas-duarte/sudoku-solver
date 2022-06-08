@@ -50,6 +50,7 @@ export default function SudokuCell(props: SudokuCellProps) {
       {isEditing && (
         <input
           autoFocus
+          type="tel"
           pattern="[0-9]*"
           value={value as number}
           onChange={(e) => {
