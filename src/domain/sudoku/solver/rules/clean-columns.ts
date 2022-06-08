@@ -14,27 +14,11 @@ function checkColumn(grid: SudokuGrid, column: number): SudokuRuleResult[] {
   }
 
   if (numbers.length === 0) {
-    return [
-      {
-        status: "success",
-        rule: "clean-column-possibilities",
-        grid: _grid,
-        message: `Column ${column + 1} have no numbers`,
-        highlight: [...columnHighlightGenerator(column)],
-      },
-    ];
+    return [];
   }
 
   if (numbers.length === 9) {
-    return [
-      {
-        status: "success",
-        rule: "clean-column-possibilities",
-        grid: _grid,
-        message: `Column ${column + 1} have all numbers`,
-        highlight: [...columnHighlightGenerator(column)],
-      },
-    ];
+    return [];
   }
 
   const results: SudokuRuleResult[] = [];
@@ -42,6 +26,10 @@ function checkColumn(grid: SudokuGrid, column: number): SudokuRuleResult[] {
     let hasChangedSomeCell = false;
     for (let cell of _column) {
       if (typeof cell === "number") {
+        continue;
+      }
+
+      if (!(cell as SudokuCellPossibilities)[number - 1]) {
         continue;
       }
 
@@ -62,14 +50,14 @@ function checkColumn(grid: SudokuGrid, column: number): SudokuRuleResult[] {
   return results;
 }
 
-export const cleanColumnPossibilities: SudokuRule = (grid: SudokuGrid) => {
+export const cleanColumns: SudokuRule = (grid: SudokuGrid) => {
   const results: SudokuRuleResult[] = [];
 
   let lastGridSolution = grid;
   for (let columnIndex = 0; columnIndex < grid.length; columnIndex++) {
     const columnResults = checkColumn(lastGridSolution, columnIndex);
     results.push(...columnResults);
-    lastGridSolution = columnResults[columnResults.length - 1].grid;
+    lastGridSolution = columnResults[columnResults.length - 1]?.grid ?? lastGridSolution;
   }
 
   return results;

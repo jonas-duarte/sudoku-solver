@@ -1,6 +1,6 @@
 import { SudokuRule, SudokuRuleResult } from "..";
 import { SudokuCellPossibilities, SudokuGrid, SudokuRow } from "../../contracts";
-import { blockHighlightGenerator, cloneGrid } from "../../utils";
+import { cloneGrid } from "../../utils";
 
 function checkBlock(grid: SudokuGrid, block: number): SudokuRuleResult[] {
   const _grid = cloneGrid(grid);
@@ -20,27 +20,11 @@ function checkBlock(grid: SudokuGrid, block: number): SudokuRuleResult[] {
   }
 
   if (numbers.length === 0) {
-    return [
-      {
-        status: "success",
-        rule: "clean-block-possibilities",
-        grid: _grid,
-        message: `Block ${block + 1} have no numbers`,
-        highlight: [...blockHighlightGenerator(block)],
-      },
-    ];
+    return [];
   }
 
   if (numbers.length === 9) {
-    return [
-      {
-        status: "success",
-        rule: "clean-block-possibilities",
-        grid: _grid,
-        message: `Block ${block + 1} have all numbers`,
-        highlight: [...blockHighlightGenerator(block)],
-      },
-    ];
+    return [];
   }
 
   const results: SudokuRuleResult[] = [];
@@ -51,33 +35,38 @@ function checkBlock(grid: SudokuGrid, block: number): SudokuRuleResult[] {
         continue;
       }
 
+      if (!(cell as SudokuCellPossibilities)[number - 1]) {
+        continue;
+      }
+
       (cell as SudokuCellPossibilities)[number - 1] = false;
       hasChangedSomeCell = true;
     }
 
-    if (hasChangedSomeCell){
+    if (hasChangedSomeCell) {
       const cellRow = Math.floor(block / 3) * 3 + Math.floor(_block.indexOf(number) / 3);
-      const cellColumn = block % 3 * 3 + _block.indexOf(number) % 3;
+      const cellColumn = (block % 3) * 3 + (_block.indexOf(number) % 3);
       results.push({
         status: "success",
         rule: "clean-block-possibilities",
         grid: cloneGrid(_grid),
         message: `Number ${number} cleaned from block ${block + 1}`,
         highlight: [[cellRow, cellColumn]],
-      });}
+      });
+    }
   }
 
   return results;
 }
 
-export const cleanBlockPossibilities: SudokuRule = (grid: SudokuGrid) => {
+export const cleanBlocks: SudokuRule = (grid: SudokuGrid) => {
   const results: SudokuRuleResult[] = [];
 
   let lastGridSolution = grid;
   for (let blockIndex = 0; blockIndex < grid.length; blockIndex++) {
     const blockResults = checkBlock(lastGridSolution, blockIndex);
     results.push(...blockResults);
-    lastGridSolution = blockResults[blockResults.length - 1].grid;
+    lastGridSolution = blockResults[blockResults.length - 1]?.grid ?? lastGridSolution;
   }
 
   return results;

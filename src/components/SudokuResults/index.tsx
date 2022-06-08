@@ -17,6 +17,9 @@ export function SudokuResults(props: SudokuResultsProps) {
           <div
             key={index}
             className={styles.result}
+            style={{
+              backgroundColor: props.selectedStep - 1 === index ? "#4C4077" : "",
+            }}
             onClick={() => {
               props.onSelectStep(index + 1);
             }}

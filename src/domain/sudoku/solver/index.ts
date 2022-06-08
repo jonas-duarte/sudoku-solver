@@ -37,10 +37,20 @@ export default class SudokuSolver {
   public solve(grid: SudokuGrid): SudokuRuleResult[] {
     const solvingResults: SudokuRuleResult[] = SudokuSolver.initializeGrid(grid);
 
-    for (const rule of this.rules) {
-      const lastSolvingResult: SudokuRuleResult = solvingResults[solvingResults.length - 1];
-      const stepsResults: SudokuRuleResult[] = rule(lastSolvingResult?.grid || grid);
-      solvingResults.push(...stepsResults);
+    let lastSolvingResultSize = 0;
+
+    while (true) {
+      for (const rule of this.rules) {
+        const lastSolvingResult: SudokuRuleResult | undefined = solvingResults[solvingResults.length - 1];
+        const stepsResults: SudokuRuleResult[] = rule(lastSolvingResult?.grid || grid);
+        solvingResults.push(...stepsResults);
+      }
+
+      if (solvingResults.length === lastSolvingResultSize || solvingResults.length > 2000) {
+        break;
+      }
+
+      lastSolvingResultSize = solvingResults.length;
     }
 
     return solvingResults;
