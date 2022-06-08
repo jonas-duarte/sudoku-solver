@@ -47,3 +47,19 @@
 .buttons button:hover {
   background-color: #e15554;
 }
+
+@media screen and (max-width: 600px) {
+  .container {
+    font-size: 1rem;
+  }
+
+  .grid {
+    width: 50vw;
+    height: 50vw;
+  }
+
+  .buttons button {
+    font-size: 1rem;
+    padding: 2px 5px;
+  }
+}

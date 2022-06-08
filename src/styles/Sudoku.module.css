@@ -185,3 +185,39 @@
 .buttons button:hover {
     background-color: #7768aeee;
 }
+
+
+@media screen and (max-width: 600px) {
+    .boardArea{
+        min-width: 100vw;
+        height: 100vh;
+    }
+
+    .boardHeader {
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    .board {
+        width: 90vw;
+        height: 90vw;
+    }
+    
+    .buttons {
+        width: 90vw;
+        gap: 0.5rem;
+    }
+
+    .buttons button {
+        font-size: 0.8rem;
+    }
+
+    .subcell {
+        font-size: 0.5rem;
+    }
+
+    .resultsArea {
+        min-width: 100vw;
+        height: 100vh;
+    }
+}
