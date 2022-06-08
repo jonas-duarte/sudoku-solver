@@ -50,6 +50,7 @@ export default function SudokuCell(props: SudokuCellProps) {
       {isEditing && (
         <input
           autoFocus
+          pattern="[0-9]*"
           value={value as number}
           onChange={(e) => {
             const value = parseInt(e.target.value);
@@ -60,6 +61,9 @@ export default function SudokuCell(props: SudokuCellProps) {
           }}
           onBlur={() => {
             setIsEditing(false);
+          }}
+          onFocus={(e) => {
+            e.target.select();
           }}
         />
       )}
