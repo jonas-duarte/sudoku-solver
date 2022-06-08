@@ -88,7 +88,7 @@ function checkGridSets(grid: SudokuGrid, mappedCells: SudokuMappedCell[], setSiz
         results.push({
           status: "success",
           rule: `check-groups-${type}`,
-          grid: _grid,
+          grid: cloneGrid(_grid),
           highlight: setCells.map((cellMap) => cellMap.position),
           message: `Set [${numbersSet.join(",")}] is only possible in ${positions.length} cells in this ${type}`,
         });
