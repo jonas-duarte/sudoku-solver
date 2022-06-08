@@ -22,6 +22,7 @@
 .boardHeader {
     font-size: 1.5rem;
     font-weight: bold;
+    text-align: center;
 }
 
 .resultsArea {
@@ -195,7 +196,6 @@
 
     .boardHeader {
         font-size: 1rem;
-        text-align: center;
     }
 
     .board {
