@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import SudokuBoard from "../components/SudokuBoard";
 import { SudokuResults } from "../components/SudokuResults";
@@ -54,15 +54,26 @@ const initialGrids: { [key: string]: SudokuGrid } = {
     [null, null, null, 2, null, 6, null, null, 4],
   ],
   Expert: [
-    [null, 7, null, null, null, 1, 9, null, null],
-    [5, null, null, 8, null, null, null, null, 3],
-    [null, null, null, null, null, null, null, 5, null],
-    [null, null, null, null, 9, null, null, null, 2],
-    [null, 9, 6, 2, null, null, null, null, 5],
-    [null, 8, null, 7, null, null, null, null, null],
-    [null, null, 8, null, null, 4, null, 6, null],
-    [7, null, 3, null, null, null, null, 2, null],
-    [4, null, null, null, 6, null, null, null, null],
+    [9, null, null, null, null, null, null, null, 4],
+    [3, null, null, 5, 6, null, null, null, null],
+    [null, 8, null, null, null, null, 5, null, null],
+    [null, null, 4, null, null, 1, 9, null, null],
+    [null, null, null, null, null, 7, null, null, null],
+    [null, 7, 1, 8, null, null, null, null, null],
+    [null, null, null, null, null, null, 4, 1, 7],
+    [null, null, null, null, 2, null, null, 8, null],
+    [null, null, null, null, 8, 3, null, 9, null],
+  ],
+  Evil: [
+    [8, null, null, null, 7, 5, null, 4, null],
+    [null, null, null, 9, null, null, null, null, null],
+    [null, 3, null, null, null, null, null, null, 6],
+    [null, null, null, 2, null, null, null, 1, null],
+    [null, 8, null, null, 1, 9, 3, null, null],
+    [9, null, null, 4, null, null, null, null, null],
+    [null, null, null, null, 2, null, null, null, null],
+    [5, null, null, null, 8, 1, null, 7, null],
+    [null, null, 7, null, null, null, 4, null, null],
   ],
 };
 
@@ -83,8 +94,8 @@ const sudokuSolver = new SudokuSolver([
   cleanRows,
   cleanColumns,
   cleanBlocks,
-  checkGroups,
   defineUniqueValues,
+  checkGroups,
   checkUniqueOnRows,
   checkUniqueOnColumns,
   checkUniqueOnBlocks,
@@ -100,6 +111,14 @@ export default function SudokuHelper() {
     const newGrid: SudokuGrid = [...grid];
     newGrid[row][column] = value;
     setGrid(newGrid);
+  };
+
+  const handleResolve = () => {
+    if (step === 0) {
+      const results = sudokuSolver.solve(grid);
+      setSolvedResults(results);
+      setStep(results.length);
+    }
   };
 
   return (
@@ -126,17 +145,7 @@ export default function SudokuHelper() {
           >
             Clear
           </button>
-          <button
-            onClick={() => {
-              if (step === 0) {
-                const results = sudokuSolver.solve(grid);
-                setSolvedResults(results);
-                setStep(results.length);
-              }
-            }}
-          >
-            Resolve
-          </button>
+          <button onClick={handleResolve}>Resolve</button>
         </div>
 
         <div className={styles.buttons}>

@@ -1,4 +1,4 @@
-import { SudokuCellPosition, SudokuGrid, SudokuCellPossibilities } from "./contracts";
+import { SudokuCellPosition, SudokuGrid, SudokuCellPossibilities, SudokuSetType } from "./contracts";
 
 export function cloneGrid(grid: SudokuGrid): SudokuGrid {
   return JSON.parse(JSON.stringify(grid));
@@ -119,4 +119,50 @@ export function defineValue(grid: SudokuGrid, position: SudokuCellPosition, valu
   newGrid = cleanBlock(newGrid, [row, column], value) || newGrid;
 
   return newGrid;
+}
+
+export function sameRow(p1: SudokuCellPosition, p2: SudokuCellPosition): boolean {
+  return p1[0] === p2[0];
+}
+
+export function sameColumn(p1: SudokuCellPosition, p2: SudokuCellPosition): boolean {
+  return p1[1] === p2[1];
+}
+
+export function sameBlock(p1: SudokuCellPosition, p2: SudokuCellPosition): boolean {
+  const block1 = Math.floor(p1[0] / 3) * 3 + Math.floor(p1[1] / 3);
+  const block2 = Math.floor(p2[0] / 3) * 3 + Math.floor(p2[1] / 3);
+
+  return block1 === block2;
+}
+
+export function cleanBySetType(
+  setType: SudokuSetType,
+  grid: SudokuGrid,
+  position: SudokuCellPosition,
+  number: number,
+  exclude?: SudokuCellPosition[]
+): SudokuGrid | null {
+  switch (setType) {
+    case "row":
+      return cleanRow(grid, position[0], number, exclude);
+    case "column":
+      return cleanColumn(grid, position[1], number, exclude);
+    case "block":
+      return cleanBlock(grid, position, number, exclude);
+  }
+
+  return null;
+}
+
+export function getSetTypeKey(setType: SudokuSetType, position: SudokuCellPosition): `${string}${number}` {
+  switch (setType) {
+    case "row":
+      return `r${position[0]}`;
+    case "column":
+      return `c${position[1]}`;
+    case "block":
+      const block = Math.floor(position[0] / 3) * 3 + Math.floor(position[1] / 3);
+      return `b${block}`;
+  }
 }

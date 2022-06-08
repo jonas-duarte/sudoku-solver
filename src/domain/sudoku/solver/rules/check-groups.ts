@@ -1,133 +1,97 @@
-import { SudokuCellPosition } from "../../contracts";
+import { SudokuCellPosition, SudokuSetType } from "../../contracts";
 import { SudokuRule, SudokuRuleResult } from "..";
 import { SudokuCellPossibilities, SudokuGrid } from "../../contracts";
-import { cleanBlock, cleanColumn, cleanRow, cloneGrid } from "../../utils";
+import { cleanBlock, cleanBySetType, cleanColumn, cleanRow, cloneGrid, getSetTypeKey, sameBlock, sameColumn, sameRow } from "../../utils";
 
 type SudokuMappedCell = {
-  value: string;
-  originalValue: SudokuCellPossibilities;
-  row: number;
-  column: number;
-  block: number;
+  cell: SudokuCellPossibilities;
+  position: SudokuCellPosition;
 };
 
-function mapGridCells(grid: SudokuGrid): SudokuMappedCell[] {
-  const cells: SudokuMappedCell[] = [];
+function mapSudokuCells(grid: SudokuGrid): SudokuMappedCell[] {
+  const mappedCells: SudokuMappedCell[] = [];
 
-  for (let rowIndex = 0; rowIndex < grid.length; rowIndex++) {
-    const row = grid[rowIndex];
-    for (let columnIndex = 0; columnIndex < row.length; columnIndex++) {
-      const cell = row[columnIndex];
+  for (let row = 0; row < 9; row++) {
+    for (let column = 0; column < 9; column++) {
+      const cell = grid[row][column];
 
-      if (Array.isArray(cell)) {
-        cells.push({
-          value: cell.map(Number).join(""),
-          originalValue: cell,
-          row: rowIndex,
-          column: columnIndex,
-          block: Math.floor(rowIndex / 3) * 3 + Math.floor(columnIndex / 3),
-        });
+      if (!Array.isArray(cell)) {
+        continue;
+      }
+
+      const position: SudokuCellPosition = [row, column];
+      mappedCells.push({ cell, position });
+    }
+  }
+
+  return mappedCells.sort((a, b) => b.cell.filter((p) => p).length - a.cell.filter((p) => p).length);
+}
+
+function createNumberSet(cell: SudokuCellPossibilities, cell2?: SudokuCellPossibilities): number[] {
+  return cell.reduce((_set, p, index) => {
+    if (p || (cell2 && cell2[index])) {
+      _set.push(index + 1);
+    }
+
+    return _set;
+  }, [] as number[]);
+}
+
+function checkGridSets(grid: SudokuGrid, mappedCells: SudokuMappedCell[], setSize: number, type: SudokuSetType): SudokuRuleResult[] {
+  const results: SudokuRuleResult[] = [];
+
+  const possibilitiesSets = new Map<string, (SudokuMappedCell & {})[]>();
+
+  for (let i = 0; i < mappedCells.length; i++) {
+    const cellMap = mappedCells[i];
+    const { cell, position } = cellMap;
+
+    for (let j = i + 1; j < mappedCells.length; j++) {
+      const cellMap2 = mappedCells[j];
+      const { cell: cell2, position: position2 } = cellMap2;
+
+      if (type === "row" && !sameRow(position, position2)) continue;
+      if (type === "column" && !sameColumn(position, position2)) continue;
+      if (type === "block" && !sameBlock(position, position2)) continue;
+
+      const set = createNumberSet(cell, cell2);
+
+      if (set.length === setSize) {
+        const setKey = `${position.join("-")}|${set.join("-")}`;
+        const setCells = possibilitiesSets.get(setKey) || [cellMap];
+        setCells.push(cellMap2);
+        possibilitiesSets.set(setKey, setCells);
       }
     }
   }
 
-  return cells;
-}
-
-function findDuplicates(grid: SudokuGrid, cells: SudokuMappedCell[]): SudokuRuleResult[] {
   let _grid = cloneGrid(grid);
 
-  const results: SudokuRuleResult[] = [];
+  for (const [setKey, setCells] of possibilitiesSets) {
+    if (setCells.length === setSize) {
+      const positions = setCells.map((cellMap) => cellMap.position);
 
-  for (let c = 0; c < cells.length; c++) {
-    const cell = cells[c];
+      const [_, possibilities] = setKey.split("|");
 
-    const possibleValues = cell.originalValue.filter((value) => value).length;
+      const numbersSet = possibilities.split("-").map((p) => parseInt(p));
 
-    const rowPositions: SudokuCellPosition[] = [[cell.row, cell.column]];
-    const columnPositions: SudokuCellPosition[] = [[cell.row, cell.column]];
-    const blockPositions: SudokuCellPosition[] = [[cell.row, cell.column]];
-
-    for (let d = c + 1; d < cells.length; d++) {
-      const duplicateCell = cells[d];
-
-      if (cell.value !== duplicateCell.value) continue;
-
-      if (cell.row === duplicateCell.row) {
-        rowPositions.push([duplicateCell.row, duplicateCell.column]);
-        if (possibleValues === rowPositions.length) {
-          let hasChanged = false;
-          cell.originalValue.forEach((value, index) => {
-            if (value) {
-              const newGrid = cleanRow(_grid, cell.row, index + 1, rowPositions);
-              if (newGrid) {
-                _grid = newGrid;
-                hasChanged = true;
-              }
-            }
-          });
-
-          if (hasChanged)
-            results.push({
-              status: "success",
-              rule: "solver-check-row-duplicates",
-              grid: cloneGrid(_grid),
-              message: "Found duplicate values in row",
-              highlight: rowPositions,
-            });
+      let hasChanged = false;
+      numbersSet.forEach((number) => {
+        const newGrid = cleanBySetType(type, _grid, positions[0], number, positions);
+        if (newGrid) {
+          _grid = newGrid;
+          hasChanged = true;
         }
-      }
+      });
 
-      if (cell.column === duplicateCell.column) {
-        columnPositions.push([duplicateCell.row, duplicateCell.column]);
-
-        if (possibleValues === columnPositions.length) {
-          let hasChanged = false;
-          cell.originalValue.forEach((value, index) => {
-            if (value) {
-              const newGrid = cleanColumn(_grid, cell.column, index + 1, columnPositions);
-              if (newGrid) {
-                _grid = newGrid;
-                hasChanged = true;
-              }
-            }
-          });
-
-          if (hasChanged)
-            results.push({
-              status: "success",
-              rule: "solver-check-column-duplicates",
-              grid: cloneGrid(_grid),
-              message: "Found duplicate values in column",
-              highlight: columnPositions,
-            });
-        }
-      }
-
-      if (cell.block === duplicateCell.block) {
-        blockPositions.push([duplicateCell.row, duplicateCell.column]);
-
-        if (possibleValues === blockPositions.length) {
-          let hasChanged = false;
-          cell.originalValue.forEach((value, index) => {
-            if (value) {
-              const newGrid = cleanBlock(_grid, [cell.row, cell.column], index + 1, blockPositions);
-              if (newGrid) {
-                _grid = newGrid;
-                hasChanged = true;
-              }
-            }
-          });
-
-          if (hasChanged)
-            results.push({
-              status: "success",
-              rule: "solver-check-block-duplicates",
-              grid: cloneGrid(_grid),
-              message: "Found duplicate values in block",
-              highlight: blockPositions,
-            });
-        }
+      if (hasChanged) {
+        results.push({
+          status: "success",
+          rule: `check-groups-${type}`,
+          grid: _grid,
+          highlight: setCells.map((cellMap) => cellMap.position),
+          message: `Set [${numbersSet.join(",")}] is only possible in ${positions.length} cells in this ${type}`,
+        });
       }
     }
   }
@@ -136,9 +100,23 @@ function findDuplicates(grid: SudokuGrid, cells: SudokuMappedCell[]): SudokuRule
 }
 
 export const checkGroups: SudokuRule = (grid: SudokuGrid): SudokuRuleResult[] => {
-  const cells: SudokuMappedCell[] = mapGridCells(grid);
+  const results: SudokuRuleResult[] = [];
 
-  const results = findDuplicates(grid, cells);
+  const mappedCells: SudokuMappedCell[] = mapSudokuCells(grid);
+
+  const greatestLength = Math.max(...mappedCells.map((mappedCell) => mappedCell.cell.filter((p) => p).length));
+
+  for (let setSize = 2; setSize <= greatestLength; setSize++) {
+    for (let type of ["row", "column", "block"]) {
+      const checkResults = checkGridSets(
+        results.length ? results[results.length - 1].grid : grid,
+        mappedCells.filter((mappedCell) => mappedCell.cell.filter((p) => p).length <= setSize),
+        setSize,
+        type as SudokuSetType
+      );
+      results.push(...checkResults);
+    }
+  }
 
   return results;
 };

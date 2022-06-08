@@ -3,3 +3,4 @@ export type SudokuCellValue = number | SudokuCellPossibilities | null;
 export type SudokuCellPosition = [number, number];
 export type SudokuRow = [SudokuCellValue, SudokuCellValue, SudokuCellValue, SudokuCellValue, SudokuCellValue, SudokuCellValue, SudokuCellValue, SudokuCellValue, SudokuCellValue];
 export type SudokuGrid = [SudokuRow, SudokuRow, SudokuRow, SudokuRow, SudokuRow, SudokuRow, SudokuRow, SudokuRow, SudokuRow];
+export type SudokuSetType = "row" | "column" | "block";
