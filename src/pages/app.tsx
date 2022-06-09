@@ -96,13 +96,13 @@ const sudokuSolver = new SudokuSolver([
   cleanRows,
   cleanColumns,
   cleanBlocks,
-  checkIfNumbersAreAtSameAxleInBlocks,
-  checkIfNumbersAreAtSameBlockInTheAxes,
-  checkGroups,
   defineUniqueValues,
   checkUniqueOnRows,
   checkUniqueOnColumns,
   checkUniqueOnBlocks,
+  checkIfNumbersAreAtSameAxleInBlocks,
+  checkIfNumbersAreAtSameBlockInTheAxes,
+  checkGroups,
 ]);
 
 export default function SudokuHelper() {
