@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { SudokuCellValue } from "../../domain/sudoku/contracts";
+import { SudokuCellValue } from "../../sudoku/contracts";
 
 import styles from "../../styles/Sudoku.module.css";
 

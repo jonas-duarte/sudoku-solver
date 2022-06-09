@@ -4,20 +4,22 @@ import { useEffect, useState } from "react";
 import SudokuBoard from "../components/SudokuBoard";
 import { SudokuResults } from "../components/SudokuResults";
 
-import { SudokuCellPosition, SudokuGrid } from "../domain/sudoku/contracts";
-import SudokuSolver, { SudokuRuleResult } from "../domain/sudoku/solver";
-import { checkGroups } from "../domain/sudoku/solver/rules/check-groups";
-import { checkUniqueOnBlocks } from "../domain/sudoku/solver/rules/check-unique-on-blocks";
-import { checkUniqueOnColumns } from "../domain/sudoku/solver/rules/check-unique-on-columns";
-import { checkUniqueOnRows } from "../domain/sudoku/solver/rules/check-unique-on-rows";
-import { cleanBlocks } from "../domain/sudoku/solver/rules/clean-blocks";
-import { cleanColumns } from "../domain/sudoku/solver/rules/clean-columns";
-import { cleanRows } from "../domain/sudoku/solver/rules/clean-rows";
-import { defineUniqueValues } from "../domain/sudoku/solver/rules/define-unique-values";
+import { SudokuCellPosition, SudokuGrid } from "../sudoku/contracts";
+import SudokuSolver, { SudokuRuleResult } from "../sudoku/solver";
+import { checkGroups } from "../sudoku/solver/rules/check-groups";
+import { checkUniqueOnBlocks } from "../sudoku/solver/rules/check-unique-on-blocks";
+import { checkUniqueOnColumns } from "../sudoku/solver/rules/check-unique-on-columns";
+import { checkUniqueOnRows } from "../sudoku/solver/rules/check-unique-on-rows";
+import { cleanBlocks } from "../sudoku/solver/rules/clean-blocks";
+import { cleanColumns } from "../sudoku/solver/rules/clean-columns";
+import { cleanRows } from "../sudoku/solver/rules/clean-rows";
+import { defineUniqueValues } from "../sudoku/solver/rules/define-unique-values";
+import {  checkIfNumbersAreAtSameAxleInBlocks } from "../sudoku/solver/rules/check-if-numbers-are-at-same-axle-in-the-blocks";
 
-import { cloneGrid } from "../domain/sudoku/utils";
+import { cloneGrid } from "../sudoku/utils";
 
 import styles from "../styles/Sudoku.module.css";
+import { checkIfNumbersAreAtSameBlockInTheAxes } from "../sudoku/solver/rules/check-if-numbers-are-at-same-block-in-the-axes";
 
 const initialGrids: { [key: string]: SudokuGrid } = {
   Easy: [
@@ -94,15 +96,17 @@ const sudokuSolver = new SudokuSolver([
   cleanRows,
   cleanColumns,
   cleanBlocks,
-  defineUniqueValues,
+  checkIfNumbersAreAtSameAxleInBlocks,
+  checkIfNumbersAreAtSameBlockInTheAxes,
   checkGroups,
+  defineUniqueValues,
   checkUniqueOnRows,
   checkUniqueOnColumns,
   checkUniqueOnBlocks,
 ]);
 
 export default function SudokuHelper() {
-  const [grid, setGrid] = useState<SudokuGrid>(initialGrids.Expert);
+  const [grid, setGrid] = useState<SudokuGrid>(initialGrids.Evil);
   const [solvedResults, setSolvedResults] = useState<SudokuRuleResult[]>([]);
   const [step, setStep] = useState<number>(0);
 
@@ -120,6 +124,10 @@ export default function SudokuHelper() {
       setStep(results.length);
     }
   };
+
+  useEffect(() => {
+    handleResolve();
+  }, []);
 
   return (
     <div className={styles.container}>

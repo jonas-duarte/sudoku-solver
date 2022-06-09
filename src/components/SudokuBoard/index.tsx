@@ -1,6 +1,6 @@
 import SudokuCell from "./SudokuCell";
 
-import { SudokuCellPosition, SudokuGrid } from "../../domain/sudoku/contracts";
+import { SudokuCellPosition, SudokuGrid } from "../../sudoku/contracts";
 
 import styles from "../../styles/Sudoku.module.css";
 

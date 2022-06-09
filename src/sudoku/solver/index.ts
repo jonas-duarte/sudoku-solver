@@ -46,7 +46,7 @@ export default class SudokuSolver {
         solvingResults.push(...stepsResults);
       }
 
-      if (solvingResults.length === lastSolvingResultSize || solvingResults.length > 2000) {
+      if (solvingResults.length === lastSolvingResultSize || solvingResults.length > 500) {
         break;
       }
 

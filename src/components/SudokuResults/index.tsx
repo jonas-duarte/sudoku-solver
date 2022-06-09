@@ -1,4 +1,4 @@
-import { SudokuRuleResult } from "../../domain/sudoku/solver";
+import { SudokuRuleResult } from "../../sudoku/solver";
 
 import styles from "../../styles/Sudoku.module.css";
 
