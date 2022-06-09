@@ -125,9 +125,9 @@ export default function SudokuHelper() {
     }
   };
 
-  useEffect(() => {
-    handleResolve();
-  }, []);
+  // useEffect(() => {
+  //   handleResolve();
+  // }, []);
 
   return (
     <div className={styles.container}>
