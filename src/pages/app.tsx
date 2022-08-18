@@ -106,7 +106,7 @@ const sudokuSolver = new SudokuSolver([
 ]);
 
 export default function SudokuHelper() {
-  const [grid, setGrid] = useState<SudokuGrid>(initialGrids.Evil);
+  const [grid, setGrid] = useState<SudokuGrid>(initialGrids.Expert);
   const [solvedResults, setSolvedResults] = useState<SudokuRuleResult[]>([]);
   const [step, setStep] = useState<number>(0);
 
