@@ -66,17 +66,17 @@ const initialGrids: { [key: string]: SudokuGrid } = {
     [null, null, null, null, 2, null, null, 8, null],
     [null, null, null, null, 8, 3, null, 9, null],
   ],
-  Evil: [
-    [8, null, null, null, 7, 5, null, 4, null],
-    [null, null, null, 9, null, null, null, null, null],
-    [null, 3, null, null, null, null, null, null, 6],
-    [null, null, null, 2, null, null, null, 1, null],
-    [null, 8, null, null, 1, 9, 3, null, null],
-    [9, null, null, 4, null, null, null, null, null],
-    [null, null, null, null, 2, null, null, null, null],
-    [5, null, null, null, 8, 1, null, 7, null],
-    [null, null, 7, null, null, null, 4, null, null],
-  ],
+//   Evil: [
+//     [8, null, null, null, 7, 5, null, 4, null],
+//     [null, null, null, 9, null, null, null, null, null],
+//     [null, 3, null, null, null, null, null, null, 6],
+//     [null, null, null, 2, null, null, null, 1, null],
+//     [null, 8, null, null, 1, 9, 3, null, null],
+//     [9, null, null, 4, null, null, null, null, null],
+//     [null, null, null, null, 2, null, null, null, null],
+//     [5, null, null, null, 8, 1, null, 7, null],
+//     [null, null, 7, null, null, null, 4, null, null],
+//   ],
 };
 
 const CLEAN_GRID: SudokuGrid = [
